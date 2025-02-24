@@ -1,5 +1,6 @@
 @import './base.css';
 
+/* Center the app and set max width */
 #app {
   max-width: 1280px;
   margin: 0 auto;
@@ -7,20 +8,23 @@
   font-weight: normal;
 }
 
+/* Link and green text styles */
 a,
 .green {
   text-decoration: none;
   color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
+  transition: background-color 0.4s, color 0.4s;
   padding: 3px;
 }
 
+/* Hover effect for links */
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
   }
 }
 
+/* Responsive layout adjustments */
 @media (min-width: 1024px) {
   body {
     display: flex;
@@ -28,8 +32,11 @@ a,
   }
 
   #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+    display: flex; /* Changed to flex for better alignment */
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center items horizontally */
+    padding: 0 2rem; /* Padding for larger screens */
   }
 }
+
+/* Additional Bootstrap utility classes can be added here */

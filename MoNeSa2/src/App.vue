@@ -18,6 +18,9 @@ export default defineComponent({
       balance: 0,
     };
   },
+  created() {
+    this.loadTransactions();
+  },
   methods: {
     addTransaction() {
       const newTransaction: Transaction = {
@@ -28,6 +31,7 @@ export default defineComponent({
 
       this.transactions.push(newTransaction);
       this.updateBalance(newTransaction);
+      this.saveTransactions();
       this.resetForm();
     },
     updateBalance(transaction: Transaction) {
@@ -42,76 +46,95 @@ export default defineComponent({
       this.description = '';
       this.transactionType = 'income';
     },
+    saveTransactions() {
+      localStorage.setItem('transactions', JSON.stringify(this.transactions));
+    },
+    loadTransactions() {
+      const storedTransactions = localStorage.getItem('transactions');
+      if (storedTransactions) {
+        this.transactions = JSON.parse(storedTransactions);
+        this.transactions.forEach(transaction => this.updateBalance(transaction));
+      }
+    },
   },
 });
 </script>
 
 <template>
-  <div id="app">
-    <h1>Today's Savings and Spending Tracker</h1>
-    <div class="container">
-      <h2>Current Balance: RM{{ balance.toFixed(2) }}</h2>
+  <div id="app" class="d-flex flex-column align-items-center justify-content-center min-vh-100">
+    <h1 class="text-center mb-4">Today's Savings and Spending Tracker</h1>
+    <h2 class="text-center mb-4">Current Balance: RM{{ balance.toFixed(2) }}</h2>
 
-      <form @submit.prevent="addTransaction">
-        <div class="form-group">
-          <label for="amount">Amount (RM)</label>
-          <input
-            type="number"
-            id="amount"
-            v-model="amount"
-            required
-            placeholder="Enter amount"
-          />
-        </div>
+    <div class="card" style="width: 100%; max-width: 600px;">
+      <div class="card-body">
+        <form @submit.prevent="addTransaction">
+          <div class="form-group">
+            <label for="amount">Amount (RM)</label>
+            <input
+              type="number"
+              id="amount"
+              v-model="amount"
+              required
+              class="form-control"
+              placeholder="Enter amount"
+            />
+          </div>
 
-        <div class="form-group">
-          <label for="description">Description</label>
-          <input
-            type="text"
-            id="description"
-            v-model="description"
-            required
-            placeholder="Enter description"
-          />
-        </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <input
+              type="text"
+              id="description"
+              v-model="description"
+              required
+              class="form-control"
+              placeholder="Enter description"
+            />
+          </div>
 
-        <div class="form-group">
-          <label for="type">Transaction Type</label>
-          <select v-model="transactionType" id="type" required>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label for="type">Transaction Type</label>
+            <select v-model="transactionType" id="type" required class="form-control">
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
 
-        <button type="submit">Add Transaction</button>
-      </form>
-
-      <h3>Transactions</h3>
-      <ul>
-        <li v-for="(transaction, index) in transactions" :key="index">
-          {{ transaction.description }}: RM{{ transaction.amount.toFixed(2) }} ({{ transaction.type }})
-        </li>
-      </ul>
+          <button type="submit" class="btn btn-primary btn-block">Add Transaction</button>
+        </form>
+      </div>
     </div>
+
+    <h3 class="mt-4">Transactions</h3>
+    <ul class="list-group" style="width: 100%; max-width: 600px;">
+      <li
+        v-for="(transaction, index) in transactions"
+        :key="index"
+        class="list-group-item d-flex justify-content-between align-items-center"
+        :class="transaction.type === 'income' ? 'list-group-item-success' : 'list-group-item-danger'"
+      >
+        <span>{{ transaction.description }}: RM{{ transaction.amount.toFixed(2) }}</span>
+        <span class="badge badge-pill">{{ transaction.type }}</span>
+      </li>
+    </ul>
   </div>
 </template>
 
 <style scoped>
 #app {
   text-align: center;
-  margin-top: 20px;
 }
 
-.container {
-  max-width: 600px;
-  margin: 0 auto;
+.card {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.form-group {
-  margin: 10px 0;
+.list-group-item {
+  transition: background-color 0.3s;
 }
 
-button {
-  margin-top: 10px;
+.list-group-item:hover {
+  background-color: #f1f1f1;
 }
 </style>
